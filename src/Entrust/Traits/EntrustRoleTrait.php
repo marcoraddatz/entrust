@@ -37,7 +37,9 @@ trait EntrustRoleTrait
             });
         }
         else {
-            return $this->perms()->get();
+            return Cache::store('array')->remember($cacheKey, 0, function () {
+                return $this->perms()->get();
+            });
         }
     }
 

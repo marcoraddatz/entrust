@@ -8,6 +8,7 @@ Own changes:
 * Added return values for trait methods
 * Added missing return values for routeNeedsPermission() and routeNeedsRoleOrPermission()
 * Added code docs
+* Use array cache for trait methods (related to [issue #468](https://github.com/Zizaco/entrust/issues/468))
 
 Following PR are included:
 

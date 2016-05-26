@@ -33,12 +33,14 @@ trait EntrustUserTrait
         $cacheKey       = 'entrust_roles_for_user_' . $this->$userPrimaryKey;
 
         if (Cache::getStore() instanceof TaggableStore) {
-            return Cache::tags(Config::get('entrust.role_user_table'))->remember($cacheKey, Config::get('cache.ttl'), function () {
+            return Cache::tags(Config::get('entrust.role_user_table'))->remember($cacheKey, Config::get('cache.ttl', 60), function () {
                 return $this->roles()->get();
             });
         }
         else {
-            return $this->roles()->get();
+            return Cache::store('array')->remember($cacheKey, 0, function () {
+                return $this->roles()->get();
+            });
         }
     }
 
@@ -47,7 +49,7 @@ trait EntrustUserTrait
      * @return mixed
      */
     public function save(array $options = [])
-    {   //both inserts and updates
+    {   // Both inserts and updates
         $result = parent::save($options);
 
         if (Cache::getStore() instanceof TaggableStore) {
