@@ -219,12 +219,8 @@ trait EntrustRoleTrait
      *
      * @return object $this
      */
-    public function detachPermission($permission = null)
+    public function detachPermission($permission)
     {
-        if (!$permission) {
-            $permission = $this->perms()->get();
-        }
-
         if (is_object($permission)) {
             $permission = $permission->getKey();
         }
@@ -261,8 +257,12 @@ trait EntrustRoleTrait
      *
      * @return object $this
      */
-    public function detachPermissions($permissions)
+    public function detachPermissions($permissions = null)
     {
+        if (!$permissions) {
+            $permissions = $this->perms()->get();
+        }
+
         foreach ($permissions as $permission) {
             $this->detachPermission($permission);
         }
