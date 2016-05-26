@@ -46,7 +46,7 @@ trait EntrustRoleTrait
      * @return bool
      */
     public function save(array $options = [])
-    {   //both inserts and updates
+    {   // Both inserts and updates
         if (!parent::save($options)) {
             return false;
         }
@@ -119,10 +119,8 @@ trait EntrustRoleTrait
      *
      * @return void|bool
      */
-    public static function boot()
+    public static function bootEntrustPermissionTrait()
     {
-        parent::boot();
-
         static::deleting(function ($role) {
             if (!method_exists(Config::get('entrust.role'), 'bootSoftDeletes')) {
                 $role->users()->sync([]);
