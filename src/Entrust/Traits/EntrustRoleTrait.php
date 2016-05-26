@@ -18,42 +18,48 @@ trait EntrustRoleTrait
     public function cachedPermissions()
     {
         $rolePrimaryKey = $this->primaryKey;
-        $cacheKey = 'entrust_permissions_for_role_'.$this->$rolePrimaryKey;
-        if(Cache::getStore() instanceof TaggableStore) {
+        $cacheKey       = 'entrust_permissions_for_role_' . $this->$rolePrimaryKey;
+        if (Cache::getStore() instanceof TaggableStore) {
             return Cache::tags(Config::get('entrust.permission_role_table'))->remember($cacheKey, Config::get('cache.ttl'), function () {
                 return $this->perms()->get();
             });
         }
         else return $this->perms()->get();
     }
+
     public function save(array $options = [])
     {   //both inserts and updates
-        if(!parent::save($options)){
+        if (!parent::save($options)) {
             return false;
         }
-        if(Cache::getStore() instanceof TaggableStore) {
+        if (Cache::getStore() instanceof TaggableStore) {
             Cache::tags(Config::get('entrust.permission_role_table'))->flush();
         }
+
         return true;
     }
+
     public function delete(array $options = [])
     {   //soft or hard
-        if(!parent::delete($options)){
+        if (!parent::delete($options)) {
             return false;
         }
-        if(Cache::getStore() instanceof TaggableStore) {
+        if (Cache::getStore() instanceof TaggableStore) {
             Cache::tags(Config::get('entrust.permission_role_table'))->flush();
         }
+
         return true;
     }
+
     public function restore()
     {   //soft delete undo's
-        if(!parent::restore()){
+        if (!parent::restore()) {
             return false;
         }
-        if(Cache::getStore() instanceof TaggableStore) {
+        if (Cache::getStore() instanceof TaggableStore) {
             Cache::tags(Config::get('entrust.permission_role_table'))->flush();
         }
+
         return true;
     }
 
@@ -64,8 +70,8 @@ trait EntrustRoleTrait
      */
     public function users()
     {
-        return $this->belongsToMany(Config::get('auth.providers.users.model'), Config::get('entrust.role_user_table'),Config::get('entrust.role_foreign_key'),Config::get('entrust.user_foreign_key'));
-       // return $this->belongsToMany(Config::get('auth.model'), Config::get('entrust.role_user_table'));
+        return $this->belongsToMany(Config::get('auth.providers.users.model'), Config::get('entrust.role_user_table'), Config::get('entrust.role_foreign_key'), Config::get('entrust.user_foreign_key'));
+        // return $this->belongsToMany(Config::get('auth.model'), Config::get('entrust.role_user_table'));
     }
 
     /**
@@ -90,7 +96,7 @@ trait EntrustRoleTrait
     {
         parent::boot();
 
-        static::deleting(function($role) {
+        static::deleting(function ($role) {
             if (!method_exists(Config::get('entrust.role'), 'bootSoftDeletes')) {
                 $role->users()->sync([]);
                 $role->perms()->sync([]);
@@ -99,7 +105,7 @@ trait EntrustRoleTrait
             return true;
         });
     }
-    
+
     /**
      * Checks if the role has a permission by its name.
      *
@@ -116,7 +122,8 @@ trait EntrustRoleTrait
 
                 if ($hasPermission && !$requireAll) {
                     return true;
-                } elseif (!$hasPermission && $requireAll) {
+                }
+                elseif (!$hasPermission && $requireAll) {
                     return false;
                 }
             }
@@ -125,7 +132,8 @@ trait EntrustRoleTrait
             // If we've made it this far and $requireAll is TRUE, then ALL of the permissions were found.
             // Return the value of $requireAll;
             return $requireAll;
-        } else {
+        }
+        else {
             foreach ($this->cachedPermissions() as $permission) {
                 if ($permission->name == $name) {
                     return true;
@@ -147,7 +155,8 @@ trait EntrustRoleTrait
     {
         if (!empty($inputPermissions)) {
             $this->perms()->sync($inputPermissions);
-        } else {
+        }
+        else {
             $this->perms()->detach();
         }
     }
@@ -166,7 +175,7 @@ trait EntrustRoleTrait
         }
 
         if (is_array($permission)) {
-            $permission = $permission['id'];
+            $permission = $permission[ 'id' ];
         }
 
         $this->perms()->attach($permission);
@@ -185,7 +194,7 @@ trait EntrustRoleTrait
             $permission = $permission->getKey();
 
         if (is_array($permission))
-            $permission = $permission['id'];
+            $permission = $permission[ 'id' ];
 
         $this->perms()->detach($permission);
     }
