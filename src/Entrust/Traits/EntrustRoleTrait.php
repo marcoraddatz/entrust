@@ -1,4 +1,6 @@
-<?php namespace Zizaco\Entrust\Traits;
+<?php
+
+namespace Zizaco\Entrust\Traits;
 
 /**
  * This file is part of Entrust,
@@ -19,24 +21,36 @@ use Illuminate\Support\Facades\Cache;
  */
 trait EntrustRoleTrait
 {
-    //Big block of caching functionality.
+    /**
+     * Big block of caching functionality.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
     public function cachedPermissions()
     {
         $rolePrimaryKey = $this->primaryKey;
         $cacheKey       = 'entrust_permissions_for_role_' . $this->$rolePrimaryKey;
+
         if (Cache::getStore() instanceof TaggableStore) {
             return Cache::tags(Config::get('entrust.permission_role_table'))->remember($cacheKey, Config::get('cache.ttl', 60), function () {
                 return $this->perms()->get();
             });
         }
-        else return $this->perms()->get();
+        else {
+            return $this->perms()->get();
+        }
     }
 
+    /**
+     * @param array $options
+     * @return bool
+     */
     public function save(array $options = [])
     {   //both inserts and updates
         if (!parent::save($options)) {
             return false;
         }
+
         if (Cache::getStore() instanceof TaggableStore) {
             Cache::tags(Config::get('entrust.permission_role_table'))->flush();
         }
@@ -44,11 +58,16 @@ trait EntrustRoleTrait
         return true;
     }
 
+    /**
+     * @param array $options
+     * @return bool
+     */
     public function delete(array $options = [])
     {   //soft or hard
         if (!parent::delete($options)) {
             return false;
         }
+
         if (Cache::getStore() instanceof TaggableStore) {
             Cache::tags(Config::get('entrust.permission_role_table'))->flush();
         }
@@ -56,11 +75,15 @@ trait EntrustRoleTrait
         return true;
     }
 
+    /**
+     * @return bool
+     */
     public function restore()
     {   //soft delete undo's
         if (!parent::restore()) {
             return false;
         }
+
         if (Cache::getStore() instanceof TaggableStore) {
             Cache::tags(Config::get('entrust.permission_role_table'))->flush();
         }
@@ -76,7 +99,6 @@ trait EntrustRoleTrait
     public function users()
     {
         return $this->belongsToMany(Config::get('auth.providers.users.model'), Config::get('entrust.role_user_table'), Config::get('entrust.role_foreign_key'), Config::get('entrust.user_foreign_key'));
-        // return $this->belongsToMany(Config::get('auth.model'), Config::get('entrust.role_user_table'));
     }
 
     /**
@@ -154,7 +176,7 @@ trait EntrustRoleTrait
      *
      * @param mixed $inputPermissions
      *
-     * @return void
+     * @return object $this
      */
     public function savePermissions($inputPermissions)
     {
@@ -164,6 +186,8 @@ trait EntrustRoleTrait
         else {
             $this->perms()->detach();
         }
+
+        return $this;
     }
 
     /**
@@ -171,7 +195,7 @@ trait EntrustRoleTrait
      *
      * @param object|array $permission
      *
-     * @return void
+     * @return object $this
      */
     public function attachPermission($permission)
     {
@@ -184,6 +208,8 @@ trait EntrustRoleTrait
         }
 
         $this->perms()->attach($permission);
+
+        return $this;
     }
 
     /**
@@ -191,7 +217,7 @@ trait EntrustRoleTrait
      *
      * @param object|array $permission
      *
-     * @return void
+     * @return object $this
      */
     public function detachPermission($permission = null)
     {
@@ -208,6 +234,8 @@ trait EntrustRoleTrait
         }
 
         $this->perms()->detach($permission);
+
+        return $this;
     }
 
     /**
@@ -215,13 +243,15 @@ trait EntrustRoleTrait
      *
      * @param mixed $permissions
      *
-     * @return void
+     * @return object $this
      */
     public function attachPermissions($permissions)
     {
         foreach ($permissions as $permission) {
             $this->attachPermission($permission);
         }
+
+        return $this;
     }
 
     /**
@@ -229,12 +259,14 @@ trait EntrustRoleTrait
      *
      * @param mixed $permissions
      *
-     * @return void
+     * @return object $this
      */
     public function detachPermissions($permissions)
     {
         foreach ($permissions as $permission) {
             $this->detachPermission($permission);
         }
+
+        return $this;
     }
 }

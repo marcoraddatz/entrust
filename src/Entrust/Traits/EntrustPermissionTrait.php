@@ -1,4 +1,6 @@
-<?php namespace Zizaco\Entrust\Traits;
+<?php
+
+namespace Zizaco\Entrust\Traits;
 
 /**
  * This file is part of Entrust,
@@ -10,6 +12,11 @@
 
 use Illuminate\Support\Facades\Config;
 
+/**
+ * Class EntrustPermissionTrait
+ *
+ * @package Zizaco\Entrust\Traits
+ */
 trait EntrustPermissionTrait
 {
     /**

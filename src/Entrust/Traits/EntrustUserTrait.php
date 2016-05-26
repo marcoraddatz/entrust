@@ -1,4 +1,6 @@
-<?php namespace Zizaco\Entrust\Traits;
+<?php
+
+namespace Zizaco\Entrust\Traits;
 
 /**
  * This file is part of Entrust,
@@ -20,41 +22,68 @@ use InvalidArgumentException;
  */
 trait EntrustUserTrait
 {
-    //Big block of caching functionality.
+    /**
+     * Big block of caching functionality.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
     public function cachedRoles()
     {
         $userPrimaryKey = $this->primaryKey;
         $cacheKey       = 'entrust_roles_for_user_' . $this->$userPrimaryKey;
+
         if (Cache::getStore() instanceof TaggableStore) {
             return Cache::tags(Config::get('entrust.role_user_table'))->remember($cacheKey, Config::get('cache.ttl'), function () {
                 return $this->roles()->get();
             });
         }
-        else return $this->roles()->get();
+        else {
+            return $this->roles()->get();
+        }
     }
 
+    /**
+     * @param array $options
+     * @return mixed
+     */
     public function save(array $options = [])
     {   //both inserts and updates
-        parent::save($options);
+        $result = parent::save($options);
+
         if (Cache::getStore() instanceof TaggableStore) {
             Cache::tags(Config::get('entrust.role_user_table'))->flush();
         }
+
+        return $result;
     }
 
+    /**
+     * @param array $options
+     * @return mixed
+     */
     public function delete(array $options = [])
     {   //soft or hard
-        parent::delete($options);
+        $result = parent::delete($options);
+
         if (Cache::getStore() instanceof TaggableStore) {
             Cache::tags(Config::get('entrust.role_user_table'))->flush();
         }
+
+        return $result;
     }
 
+    /**
+     * @return mixed
+     */
     public function restore()
     {   //soft delete undo's
-        parent::restore();
+        $result = parent::restore();
+
         if (Cache::getStore() instanceof TaggableStore) {
             Cache::tags(Config::get('entrust.role_user_table'))->flush();
         }
+
+        return $result;
     }
 
     /**
@@ -183,6 +212,7 @@ trait EntrustUserTrait
         if (!is_array($roles)) {
             $roles = explode(',', $roles);
         }
+
         if (!is_array($permissions)) {
             $permissions = explode(',', $permissions);
         }
@@ -196,6 +226,7 @@ trait EntrustUserTrait
                 throw new InvalidArgumentException();
             }
         }
+
         if (!isset($options[ 'return_type' ])) {
             $options[ 'return_type' ] = 'boolean';
         }
@@ -211,9 +242,11 @@ trait EntrustUserTrait
         // Loop through roles and permissions and check each.
         $checkedRoles       = [];
         $checkedPermissions = [];
+
         foreach ($roles as $role) {
             $checkedRoles[ $role ] = $this->hasRole($role);
         }
+
         foreach ($permissions as $permission) {
             $checkedPermissions[ $permission ] = $this->can($permission);
         }
@@ -246,6 +279,7 @@ trait EntrustUserTrait
      * Alias to eloquent many-to-many relation's attach() method.
      *
      * @param mixed $role
+     * @return object $this
      */
     public function attachRole($role)
     {
@@ -258,12 +292,15 @@ trait EntrustUserTrait
         }
 
         $this->roles()->attach($role);
+
+        return $this;
     }
 
     /**
      * Alias to eloquent many-to-many relation's detach() method.
      *
      * @param mixed $role
+     * @return object $this
      */
     public function detachRole($role)
     {
@@ -276,33 +313,41 @@ trait EntrustUserTrait
         }
 
         $this->roles()->detach($role);
+
+        return $this;
     }
 
     /**
      * Attach multiple roles to a user
      *
      * @param mixed $roles
+     * @return object $this
      */
     public function attachRoles($roles)
     {
         foreach ($roles as $role) {
             $this->attachRole($role);
         }
+
+        return $this;
     }
 
     /**
      * Detach multiple roles from a user
      *
      * @param mixed $roles
+     * @return object $this
      */
     public function detachRoles($roles = null)
     {
-        if (!$roles)
+        if (!$roles) {
             $roles = $this->roles()->get();
+        }
 
         foreach ($roles as $role) {
             $this->detachRole($role);
         }
-    }
 
+        return $this;
+    }
 }
