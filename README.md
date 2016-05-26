@@ -2,7 +2,12 @@
 
 **This fork focuses on fixing some serious issues with Laravel 5.2.**
 
+Own changes:
+
 * Laravel 5.2 branch has been merged with master
+* Added return values for trait methods
+* Added missing return values for routeNeedsPermission() and routeNeedsRoleOrPermission()
+* Added code docs
 
 Following PR are included:
 
