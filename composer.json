@@ -1,6 +1,6 @@
 {
-  "name": "zizaco/entrust",
-  "description": "This package provides a flexible way to add Role-based Permissions to Laravel",
+  "name": "marcoraddatz/entrust",
+  "description": "This package provides a flexible way to add role-based permissions to Laravel",
   "keywords": [
     "laravel",
     "illuminate",
@@ -26,6 +26,10 @@
     {
       "name": "Michele Angioni",
       "email": "michele.angioni@gmail.com"
+    },
+    {
+      "name": "Marco Raddatz",
+      "homepage": "https://www.marcoraddatz.com"
     }
   ],
   "require": {
