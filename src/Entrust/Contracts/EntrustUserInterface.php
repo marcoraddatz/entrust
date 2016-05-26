@@ -1,4 +1,6 @@
-<?php namespace Zizaco\Entrust\Contracts;
+<?php
+
+namespace Zizaco\Entrust\Contracts;
 
 /**
  * This file is part of Entrust,
@@ -26,7 +28,7 @@ interface EntrustUserInterface
      * @return bool
      */
     public function hasRole($name, $requireAll = false);
-    
+
     /**
      * Check if user has a permission by its name.
      *
@@ -36,7 +38,7 @@ interface EntrustUserInterface
      * @return bool
      */
     public function can($permission, $requireAll = false);
-    
+
     /**
      * Checks role(s) and permission(s).
      *
@@ -49,28 +51,28 @@ interface EntrustUserInterface
      * @return array|bool
      */
     public function ability($roles, $permissions, $options = []);
-    
+
     /**
      * Alias to eloquent many-to-many relation's attach() method.
      *
      * @param mixed $role
      */
     public function attachRole($role);
-    
+
     /**
      * Alias to eloquent many-to-many relation's detach() method.
      *
      * @param mixed $role
      */
     public function detachRole($role);
-    
+
     /**
      * Attach multiple roles to a user
      *
      * @param mixed $roles
      */
     public function attachRoles($roles);
-    
+
     /**
      * Detach multiple roles from a user
      *

@@ -1,4 +1,6 @@
-<?php namespace Zizaco\Entrust;
+<?php
+
+namespace Zizaco\Entrust;
 
 /**
  * This file is part of Entrust,
@@ -13,6 +15,11 @@ use Zizaco\Entrust\Traits\EntrustRoleTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
 
+/**
+ * Class EntrustRole
+ *
+ * @package Zizaco\Entrust
+ */
 class EntrustRole extends Model implements EntrustRoleInterface
 {
     use EntrustRoleTrait;

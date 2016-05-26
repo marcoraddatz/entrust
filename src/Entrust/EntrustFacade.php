@@ -1,4 +1,6 @@
-<?php namespace Zizaco\Entrust;
+<?php
+
+namespace Zizaco\Entrust;
 
 /**
  * This file is part of Entrust,
@@ -10,6 +12,11 @@
 
 use Illuminate\Support\Facades\Facade;
 
+/**
+ * Class EntrustFacade
+ *
+ * @package Zizaco\Entrust
+ */
 class EntrustFacade extends Facade
 {
     /**

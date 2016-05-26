@@ -4,17 +4,22 @@ use Zizaco\Entrust\Entrust;
 use Illuminate\Support\Facades\Facade;
 use Mockery as m;
 
+/**
+ * Class EntrustTest
+ */
 class EntrustTest extends PHPUnit_Framework_TestCase
 {
     protected $nullFilterTest;
+
     protected $abortFilterTest;
+
     protected $customResponseFilterTest;
 
     protected $expectedResponse;
 
     public function setUp()
     {
-        $this->nullFilterTest = function($filterClosure) {
+        $this->nullFilterTest = function ($filterClosure) {
             if (!($filterClosure instanceof Closure)) {
                 return false;
             }
@@ -24,14 +29,15 @@ class EntrustTest extends PHPUnit_Framework_TestCase
             return true;
         };
 
-        $this->abortFilterTest = function($filterClosure) {
+        $this->abortFilterTest = function ($filterClosure) {
             if (!($filterClosure instanceof Closure)) {
                 return false;
             }
 
             try {
                 $filterClosure();
-            } catch (Exception $e) {
+            }
+            catch (Exception $e) {
                 $this->assertSame('abort', $e->getMessage());
 
                 return true;
@@ -41,7 +47,7 @@ class EntrustTest extends PHPUnit_Framework_TestCase
             return false;
         };
 
-        $this->customResponseFilterTest = function($filterClosure) {
+        $this->customResponseFilterTest = function ($filterClosure) {
             if (!($filterClosure instanceof Closure)) {
                 return false;
             }
@@ -66,9 +72,9 @@ class EntrustTest extends PHPUnit_Framework_TestCase
         | Set
         |------------------------------------------------------------
         */
-        $app = new stdClass();
+        $app     = new stdClass();
         $entrust = m::mock('Zizaco\Entrust\Entrust[user]', [$app]);
-        $user = m::mock('_mockedUser');
+        $user    = m::mock('_mockedUser');
 
         /*
         |------------------------------------------------------------
@@ -76,22 +82,22 @@ class EntrustTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
         $entrust->shouldReceive('user')
-            ->andReturn($user)
-            ->twice()->ordered();
+                ->andReturn($user)
+                ->twice()->ordered();
 
         $entrust->shouldReceive('user')
-            ->andReturn(false)
-            ->once()->ordered();
+                ->andReturn(false)
+                ->once()->ordered();
 
         $user->shouldReceive('hasRole')
-            ->with('UserRole', false)
-            ->andReturn(true)
-            ->once();
+             ->with('UserRole', false)
+             ->andReturn(true)
+             ->once();
 
         $user->shouldReceive('hasRole')
-            ->with('NonUserRole', false)
-            ->andReturn(false)
-            ->once();
+             ->with('NonUserRole', false)
+             ->andReturn(false)
+             ->once();
 
         /*
         |------------------------------------------------------------
@@ -110,9 +116,9 @@ class EntrustTest extends PHPUnit_Framework_TestCase
         | Set
         |------------------------------------------------------------
         */
-        $app = new stdClass();
+        $app     = new stdClass();
         $entrust = m::mock('Zizaco\Entrust\Entrust[user]', [$app]);
-        $user = m::mock('_mockedUser');
+        $user    = m::mock('_mockedUser');
 
         /*
         |------------------------------------------------------------
@@ -120,22 +126,22 @@ class EntrustTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
         $entrust->shouldReceive('user')
-            ->andReturn($user)
-            ->twice()->ordered();
+                ->andReturn($user)
+                ->twice()->ordered();
 
         $entrust->shouldReceive('user')
-            ->andReturn(false)
-            ->once()->ordered();
+                ->andReturn(false)
+                ->once()->ordered();
 
         $user->shouldReceive('can')
-            ->with('user_can', false)
-            ->andReturn(true)
-            ->once();
+             ->with('user_can', false)
+             ->andReturn(true)
+             ->once();
 
         $user->shouldReceive('can')
-            ->with('user_cannot', false)
-            ->andReturn(false)
-            ->once();
+             ->with('user_cannot', false)
+             ->andReturn(false)
+             ->once();
 
         /*
         |------------------------------------------------------------
@@ -154,10 +160,10 @@ class EntrustTest extends PHPUnit_Framework_TestCase
         | Set
         |------------------------------------------------------------
         */
-        $app = new stdClass();
+        $app       = new stdClass();
         $app->auth = m::mock('Auth');
-        $entrust = new Entrust($app);
-        $user = m::mock('_mockedUser');
+        $entrust   = new Entrust($app);
+        $user      = m::mock('_mockedUser');
 
         /*
         |------------------------------------------------------------
@@ -165,8 +171,8 @@ class EntrustTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
         $app->auth->shouldReceive('user')
-            ->andReturn($user)
-            ->once();
+                  ->andReturn($user)
+                  ->once();
 
         /*
         |------------------------------------------------------------
@@ -183,12 +189,12 @@ class EntrustTest extends PHPUnit_Framework_TestCase
         | Set
         |------------------------------------------------------------
         */
-        $app = new stdClass();
+        $app         = new stdClass();
         $app->router = m::mock('Route');
-        $entrust = new Entrust($app);
+        $entrust     = new Entrust($app);
 
-        $route = 'route';
-        $oneRole = 'RoleA';
+        $route    = 'route';
+        $oneRole  = 'RoleA';
         $manyRole = ['RoleA', 'RoleB', 'RoleC'];
 
         $oneRoleFilterName  = $this->makeFilterName($route, [$oneRole]);
@@ -200,12 +206,12 @@ class EntrustTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
         $app->router->shouldReceive('filter')
-            ->with(m::anyOf($oneRoleFilterName, $manyRoleFilterName), m::type('Closure'))
-            ->twice()->ordered();
+                    ->with(m::anyOf($oneRoleFilterName, $manyRoleFilterName), m::type('Closure'))
+                    ->twice()->ordered();
 
         $app->router->shouldReceive('when')
-            ->with($route, m::anyOf($oneRoleFilterName, $manyRoleFilterName))
-            ->twice();
+                    ->with($route, m::anyOf($oneRoleFilterName, $manyRoleFilterName))
+                    ->twice();
 
         /*
         |------------------------------------------------------------
@@ -223,15 +229,15 @@ class EntrustTest extends PHPUnit_Framework_TestCase
         | Set
         |------------------------------------------------------------
         */
-        $app = new stdClass();
+        $app         = new stdClass();
         $app->router = m::mock('Route');
-        $entrust = new Entrust($app);
+        $entrust     = new Entrust($app);
 
-        $route = 'route';
-        $onePerm = 'can_a';
+        $route    = 'route';
+        $onePerm  = 'can_a';
         $manyPerm = ['can_a', 'can_b', 'can_c'];
 
-        $onePermFilterName = $this->makeFilterName($route, [$onePerm]);
+        $onePermFilterName  = $this->makeFilterName($route, [$onePerm]);
         $manyPermFilterName = $this->makeFilterName($route, $manyPerm);
 
         /*
@@ -240,12 +246,12 @@ class EntrustTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
         $app->router->shouldReceive('filter')
-            ->with(m::anyOf($onePermFilterName, $manyPermFilterName), m::type('Closure'))
-            ->twice()->ordered();
+                    ->with(m::anyOf($onePermFilterName, $manyPermFilterName), m::type('Closure'))
+                    ->twice()->ordered();
 
         $app->router->shouldReceive('when')
-            ->with($route, m::anyOf($onePermFilterName, $manyPermFilterName))
-            ->twice();
+                    ->with($route, m::anyOf($onePermFilterName, $manyPermFilterName))
+                    ->twice();
 
         /*
         |------------------------------------------------------------
@@ -263,19 +269,19 @@ class EntrustTest extends PHPUnit_Framework_TestCase
         | Set
         |------------------------------------------------------------
         */
-        $app = new stdClass();
+        $app         = new stdClass();
         $app->router = m::mock('Route');
-        $entrust = new Entrust($app);
+        $entrust     = new Entrust($app);
 
-        $route = 'route';
-        $oneRole = 'RoleA';
+        $route    = 'route';
+        $oneRole  = 'RoleA';
         $manyRole = ['RoleA', 'RoleB', 'RoleC'];
-        $onePerm = 'can_a';
+        $onePerm  = 'can_a';
         $manyPerm = ['can_a', 'can_b', 'can_c'];
 
-        $oneRoleOnePermFilterName = $this->makeFilterName($route, [$oneRole], [$onePerm]);
-        $oneRoleManyPermFilterName = $this->makeFilterName($route, [$oneRole], $manyPerm);
-        $manyRoleOnePermFilterName = $this->makeFilterName($route, $manyRole, [$onePerm]);
+        $oneRoleOnePermFilterName   = $this->makeFilterName($route, [$oneRole], [$onePerm]);
+        $oneRoleManyPermFilterName  = $this->makeFilterName($route, [$oneRole], $manyPerm);
+        $manyRoleOnePermFilterName  = $this->makeFilterName($route, $manyRole, [$onePerm]);
         $manyRoleManyPermFilterName = $this->makeFilterName($route, $manyRole, $manyPerm);
 
         /*
@@ -284,28 +290,28 @@ class EntrustTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
         $app->router->shouldReceive('filter')
-            ->with(
-                m::anyOf(
-                    $oneRoleOnePermFilterName,
-                    $oneRoleManyPermFilterName,
-                    $manyRoleOnePermFilterName,
-                    $manyRoleManyPermFilterName
-                ),
-                m::type('Closure')
-            )
-            ->times(4)->ordered();
+                    ->with(
+                        m::anyOf(
+                            $oneRoleOnePermFilterName,
+                            $oneRoleManyPermFilterName,
+                            $manyRoleOnePermFilterName,
+                            $manyRoleManyPermFilterName
+                        ),
+                        m::type('Closure')
+                    )
+                    ->times(4)->ordered();
 
         $app->router->shouldReceive('when')
-            ->with(
-                $route,
-                m::anyOf(
-                    $oneRoleOnePermFilterName,
-                    $oneRoleManyPermFilterName,
-                    $manyRoleOnePermFilterName,
-                    $manyRoleManyPermFilterName
-                )
-            )
-            ->times(4);
+                    ->with(
+                        $route,
+                        m::anyOf(
+                            $oneRoleOnePermFilterName,
+                            $oneRoleManyPermFilterName,
+                            $manyRoleOnePermFilterName,
+                            $manyRoleManyPermFilterName
+                        )
+                    )
+                    ->times(4);
 
         /*
         |------------------------------------------------------------
@@ -375,21 +381,21 @@ class EntrustTest extends PHPUnit_Framework_TestCase
     {
         return [
             // Both role and permission pass, null is returned
-            [true,  true,  'nullFilterTest'],
-            [true,  true,  'nullFilterTest', true],
+            [true, true, 'nullFilterTest'],
+            [true, true, 'nullFilterTest', true],
             // Role OR permission fail, require all is false, null is returned
-            [false, true,  'nullFilterTest'],
-            [true,  false, 'nullFilterTest'],
+            [false, true, 'nullFilterTest'],
+            [true, false, 'nullFilterTest'],
             // Role and/or permission fail, App::abort() is called
-            [false, true,  'abortFilterTest', true,  true],
-            [true,  false, 'abortFilterTest', true,  true],
+            [false, true, 'abortFilterTest', true, true],
+            [true, false, 'abortFilterTest', true, true],
             [false, false, 'abortFilterTest', false, true],
-            [false, false, 'abortFilterTest', true,  true],
+            [false, false, 'abortFilterTest', true, true],
             // Role and/or permission fail, custom response is returned
-            [false, true,  'customResponseFilterTest', true,  false, new stdClass()],
-            [true,  false, 'customResponseFilterTest', true,  false, new stdClass()],
+            [false, true, 'customResponseFilterTest', true, false, new stdClass()],
+            [true, false, 'customResponseFilterTest', true, false, new stdClass()],
             [false, false, 'customResponseFilterTest', false, false, new stdClass()],
-            [false, false, 'customResponseFilterTest', true,  false, new stdClass()]
+            [false, false, 'customResponseFilterTest', true, false, new stdClass()]
         ];
     }
 
@@ -398,7 +404,8 @@ class EntrustTest extends PHPUnit_Framework_TestCase
      */
     public function testFilterGeneratedByRouteNeedsRoleOrPermission(
         $roleIsValid, $permIsValid, $filterTest, $requireAll = false, $abort = false, $expectedResponse = null
-    ) {
+    )
+    {
         $app         = m::mock('Illuminate\Foundation\Application');
         $app->router = m::mock('Route');
         $entrust     = m::mock('Zizaco\Entrust\Entrust[hasRole, can]', [$app]);
@@ -428,7 +435,8 @@ class EntrustTest extends PHPUnit_Framework_TestCase
     {
         if (is_null($permissions)) {
             return implode('_', $roles) . '_' . substr(md5($route), 0, 6);
-        } else {
+        }
+        else {
             return implode('_', $roles) . '_' . implode('_', $permissions) . '_' . substr(md5($route), 0, 6);
         }
     }

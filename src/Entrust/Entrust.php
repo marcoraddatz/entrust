@@ -1,4 +1,6 @@
-<?php namespace Zizaco\Entrust;
+<?php
+
+namespace Zizaco\Entrust;
 
 /**
  * This class is the main entry point of entrust. Usually this the interaction
@@ -64,9 +66,9 @@ class Entrust
     /**
      * Check if the current user has a role or permission by its name
      *
-     * @param array|string $roles            The role(s) needed.
-     * @param array|string $permissions      The permission(s) needed.
-     * @param array $options                 The Options.
+     * @param array|string $roles       The role(s) needed.
+     * @param array|string $permissions The permission(s) needed.
+     * @param array        $options     The Options.
      *
      * @return bool
      */
@@ -104,8 +106,8 @@ class Entrust
      */
     public function routeNeedsRole($route, $roles, $result = null, $requireAll = true)
     {
-        $filterName  = is_array($roles) ? implode('_', $roles) : $roles;
-        $filterName .= '_'.substr(md5($route), 0, 6);
+        $filterName = is_array($roles) ? implode('_', $roles) : $roles;
+        $filterName .= '_' . substr(md5($route), 0, 6);
 
         $closure = function () use ($roles, $result, $requireAll) {
             $hasRole = $this->hasRole($roles, $requireAll);
@@ -138,8 +140,8 @@ class Entrust
      */
     public function routeNeedsPermission($route, $permissions, $result = null, $requireAll = true)
     {
-        $filterName  = is_array($permissions) ? implode('_', $permissions) : $permissions;
-        $filterName .= '_'.substr(md5($route), 0, 6);
+        $filterName = is_array($permissions) ? implode('_', $permissions) : $permissions;
+        $filterName .= '_' . substr(md5($route), 0, 6);
 
         $closure = function () use ($permissions, $result, $requireAll) {
             $hasPerm = $this->can($permissions, $requireAll);
@@ -147,6 +149,8 @@ class Entrust
             if (!$hasPerm) {
                 return empty($result) ? $this->app->abort(403) : $result;
             }
+
+            return null;
         };
 
         // Same as Route::filter, registers a new filter
@@ -173,9 +177,9 @@ class Entrust
      */
     public function routeNeedsRoleOrPermission($route, $roles, $permissions, $result = null, $requireAll = false)
     {
-        $filterName  =      is_array($roles)       ? implode('_', $roles)       : $roles;
-        $filterName .= '_'.(is_array($permissions) ? implode('_', $permissions) : $permissions);
-        $filterName .= '_'.substr(md5($route), 0, 6);
+        $filterName = is_array($roles) ? implode('_', $roles) : $roles;
+        $filterName .= '_' . (is_array($permissions) ? implode('_', $permissions) : $permissions);
+        $filterName .= '_' . substr(md5($route), 0, 6);
 
         $closure = function () use ($roles, $permissions, $result, $requireAll) {
             $hasRole  = $this->hasRole($roles, $requireAll);
@@ -183,13 +187,16 @@ class Entrust
 
             if ($requireAll) {
                 $hasRolePerm = $hasRole && $hasPerms;
-            } else {
+            }
+            else {
                 $hasRolePerm = $hasRole || $hasPerms;
             }
 
             if (!$hasRolePerm) {
                 return empty($result) ? $this->app->abort(403) : $result;
             }
+
+            return null;
         };
 
         // Same as Route::filter, registers a new filter

@@ -12,6 +12,11 @@ use Illuminate\Cache\TaggableStore;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * Class EntrustRoleTrait
+ *
+ * @package Zizaco\Entrust\Traits
+ */
 trait EntrustRoleTrait
 {
     //Big block of caching functionality.
@@ -20,7 +25,7 @@ trait EntrustRoleTrait
         $rolePrimaryKey = $this->primaryKey;
         $cacheKey       = 'entrust_permissions_for_role_' . $this->$rolePrimaryKey;
         if (Cache::getStore() instanceof TaggableStore) {
-            return Cache::tags(Config::get('entrust.permission_role_table'))->remember($cacheKey, Config::get('cache.ttl'), function () {
+            return Cache::tags(Config::get('entrust.permission_role_table'))->remember($cacheKey, Config::get('cache.ttl', 60), function () {
                 return $this->perms()->get();
             });
         }
@@ -188,13 +193,19 @@ trait EntrustRoleTrait
      *
      * @return void
      */
-    public function detachPermission($permission)
+    public function detachPermission($permission = null)
     {
-        if (is_object($permission))
-            $permission = $permission->getKey();
+        if (!$permission) {
+            $permission = $this->perms()->get();
+        }
 
-        if (is_array($permission))
+        if (is_object($permission)) {
+            $permission = $permission->getKey();
+        }
+
+        if (is_array($permission)) {
             $permission = $permission[ 'id' ];
+        }
 
         $this->perms()->detach($permission);
     }
