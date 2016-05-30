@@ -38,10 +38,20 @@ trait EntrustUserTrait
             });
         }
         else {
-            return Cache::store('array')->remember($cacheKey, 0, function () {
-                return $this->roles()->get();
-            });
+            //            return Cache::store('array')->remember($cacheKey, 0, function () {
+            return $this->roles()->get();
+            //            });
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function flushCache()
+    {
+        return Cache::getStore() instanceof TaggableStore ?
+            Cache::tags(Config::get('entrust.role_user_table'))->flush() :
+            Cache::store('array')->flush();
     }
 
     /**
@@ -49,14 +59,9 @@ trait EntrustUserTrait
      * @return mixed
      */
     public function save(array $options = [])
-    {   // Both inserts and updates
-        $result = parent::save($options);
-
-        if (Cache::getStore() instanceof TaggableStore) {
-            Cache::tags(Config::get('entrust.role_user_table'))->flush();
-        }
-
-        return $result;
+    {
+        // Both inserts and updates
+        return parent::save($options) ? $this->flushCache() : false;
     }
 
     /**
@@ -64,28 +69,17 @@ trait EntrustUserTrait
      * @return mixed
      */
     public function delete(array $options = [])
-    {   //soft or hard
-        $result = parent::delete($options);
-
-        if (Cache::getStore() instanceof TaggableStore) {
-            Cache::tags(Config::get('entrust.role_user_table'))->flush();
-        }
-
-        return $result;
+    {   // Soft or hard
+        return parent::delete($options) ? $this->flushCache() : false;
     }
 
     /**
      * @return mixed
      */
     public function restore()
-    {   //soft delete undo's
-        $result = parent::restore();
-
-        if (Cache::getStore() instanceof TaggableStore) {
-            Cache::tags(Config::get('entrust.role_user_table'))->flush();
-        }
-
-        return $result;
+    {
+        // Soft delete undo's
+        return parent::restore() ? $this->flushCache() : false;
     }
 
     /**

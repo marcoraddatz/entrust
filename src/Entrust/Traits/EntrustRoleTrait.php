@@ -44,20 +44,22 @@ trait EntrustRoleTrait
     }
 
     /**
+     * @return mixed
+     */
+    protected function flushCache() {
+        return Cache::getStore() instanceof TaggableStore ?
+            Cache::tags(Config::get('entrust.permission_role_table'))->flush() :
+            Cache::store('array')->flush();
+    }
+
+    /**
      * @param array $options
      * @return bool
      */
     public function save(array $options = [])
-    {   // Both inserts and updates
-        if (!parent::save($options)) {
-            return false;
-        }
-
-        if (Cache::getStore() instanceof TaggableStore) {
-            Cache::tags(Config::get('entrust.permission_role_table'))->flush();
-        }
-
-        return true;
+    {
+        // Both inserts and updates
+        return parent::save($options) ? $this->flushCache() : false;
     }
 
     /**
@@ -65,32 +67,18 @@ trait EntrustRoleTrait
      * @return bool
      */
     public function delete(array $options = [])
-    {   //soft or hard
-        if (!parent::delete($options)) {
-            return false;
-        }
-
-        if (Cache::getStore() instanceof TaggableStore) {
-            Cache::tags(Config::get('entrust.permission_role_table'))->flush();
-        }
-
-        return true;
+    {
+        // Soft or hard
+        return parent::delete($options) ? $this->flushCache() : false;
     }
 
     /**
      * @return bool
      */
     public function restore()
-    {   //soft delete undo's
-        if (!parent::restore()) {
-            return false;
-        }
-
-        if (Cache::getStore() instanceof TaggableStore) {
-            Cache::tags(Config::get('entrust.permission_role_table'))->flush();
-        }
-
-        return true;
+    {
+        // Soft delete undo's
+        return !parent::restore() ? $this->flushCache() : false;
     }
 
     /**
