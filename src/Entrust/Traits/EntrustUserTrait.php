@@ -11,9 +11,9 @@ namespace Zizaco\Entrust\Traits;
  */
 
 use Illuminate\Cache\TaggableStore;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Config;
 use InvalidArgumentException;
+
+use Cache;
 
 /**
  * Class EntrustUserTrait
@@ -33,25 +33,27 @@ trait EntrustUserTrait
         $cacheKey       = 'entrust_roles_for_user_' . $this->$userPrimaryKey;
 
         if (Cache::getStore() instanceof TaggableStore) {
-            return Cache::tags(Config::get('entrust.role_user_table'))->remember($cacheKey, Config::get('cache.ttl', 60), function () {
+            return Cache::tags(config('entrust.role_user_table'))->remember($cacheKey, config('cache.ttl', 60), function () {
                 return $this->roles()->get();
             });
         }
         else {
-            //            return Cache::store('array')->remember($cacheKey, 0, function () {
-            return $this->roles()->get();
-            //            });
+            return Cache::store('array')->remember($cacheKey, 0, function () {
+                return $this->roles()->get();
+            });
         }
     }
 
     /**
-     * @return mixed
+     * @return $this
      */
-    protected function flushCache()
+    public function flushCache()
     {
-        return Cache::getStore() instanceof TaggableStore ?
-            Cache::tags(Config::get('entrust.role_user_table'))->flush() :
-            Cache::store('array')->flush();
+        if (Cache::getStore() instanceof TaggableStore) {
+            Cache::tags(config('entrust.role_user_table'))->flush();
+        }
+
+        return $this;
     }
 
     /**
@@ -69,8 +71,9 @@ trait EntrustUserTrait
      * @return mixed
      */
     public function delete(array $options = [])
-    {   // Soft or hard
-        return parent::delete($options) ? $this->flushCache() : false;
+    {
+        // Soft or hard
+        return parent::delete($options) ?: false;
     }
 
     /**
@@ -89,7 +92,7 @@ trait EntrustUserTrait
      */
     public function roles()
     {
-        return $this->belongsToMany(Config::get('entrust.role'), Config::get('entrust.role_user_table'), Config::get('entrust.user_foreign_key'), Config::get('entrust.role_foreign_key'));
+        return $this->belongsToMany(config('entrust.role'), config('entrust.role_user_table'), config('entrust.user_foreign_key'), config('entrust.role_foreign_key'));
     }
 
     /**
@@ -102,7 +105,7 @@ trait EntrustUserTrait
     public static function bootEntrustPermissionTrait()
     {
         static::deleting(function ($user) {
-            if (!method_exists(Config::get('auth.model'), 'bootSoftDeletes')) {
+            if (!method_exists(config('auth.model'), 'bootSoftDeletes')) {
                 $user->roles()->sync([]);
             }
 
@@ -262,10 +265,19 @@ trait EntrustUserTrait
             return $validateAll;
         }
         elseif ($options[ 'return_type' ] == 'array') {
-            return ['roles' => $checkedRoles, 'permissions' => $checkedPermissions];
+            return [
+                'roles'       => $checkedRoles,
+                'permissions' => $checkedPermissions
+            ];
         }
         else {
-            return [$validateAll, ['roles' => $checkedRoles, 'permissions' => $checkedPermissions]];
+            return [
+                $validateAll,
+                [
+                    'roles'       => $checkedRoles,
+                    'permissions' => $checkedPermissions
+                ]
+            ];
         }
     }
 

@@ -11,8 +11,8 @@ namespace Zizaco\Entrust\Traits;
  */
 
 use Illuminate\Cache\TaggableStore;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Cache;
+
+use Cache;
 
 /**
  * Class EntrustRoleTrait
@@ -32,7 +32,7 @@ trait EntrustRoleTrait
         $cacheKey       = 'entrust_permissions_for_role_' . $this->$rolePrimaryKey;
 
         if (Cache::getStore() instanceof TaggableStore) {
-            return Cache::tags(Config::get('entrust.permission_role_table'))->remember($cacheKey, Config::get('cache.ttl', 60), function () {
+            return Cache::tags(config('entrust.permission_role_table'))->remember($cacheKey, config('cache.ttl', 60), function () {
                 return $this->perms()->get();
             });
         }
@@ -46,10 +46,13 @@ trait EntrustRoleTrait
     /**
      * @return mixed
      */
-    protected function flushCache() {
-        return Cache::getStore() instanceof TaggableStore ?
-            Cache::tags(Config::get('entrust.permission_role_table'))->flush() :
-            Cache::store('array')->flush();
+    protected function flushCache()
+    {
+        if (Cache::getStore() instanceof TaggableStore) {
+            Cache::tags(config('entrust.permission_role_table'))->flush();
+        }
+
+        return $this;
     }
 
     /**
@@ -88,7 +91,7 @@ trait EntrustRoleTrait
      */
     public function users()
     {
-        return $this->belongsToMany(Config::get('auth.providers.users.model'), Config::get('entrust.role_user_table'), Config::get('entrust.role_foreign_key'), Config::get('entrust.user_foreign_key'));
+        return $this->belongsToMany(config('auth.providers.users.model'), config('entrust.role_user_table'), config('entrust.role_foreign_key'), config('entrust.user_foreign_key'));
     }
 
     /**
@@ -99,7 +102,7 @@ trait EntrustRoleTrait
      */
     public function perms()
     {
-        return $this->belongsToMany(Config::get('entrust.permission'), Config::get('entrust.permission_role_table'), Config::get('entrust.role_foreign_key'), Config::get('entrust.permission_foreign_key'));
+        return $this->belongsToMany(config('entrust.permission'), config('entrust.permission_role_table'), config('entrust.role_foreign_key'), config('entrust.permission_foreign_key'));
     }
 
     /**
@@ -112,7 +115,7 @@ trait EntrustRoleTrait
     public static function bootEntrustPermissionTrait()
     {
         static::deleting(function ($role) {
-            if (!method_exists(Config::get('entrust.role'), 'bootSoftDeletes')) {
+            if (!method_exists(config('entrust.role'), 'bootSoftDeletes')) {
                 $role->users()->sync([]);
                 $role->perms()->sync([]);
             }
