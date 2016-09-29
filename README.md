@@ -1,6 +1,6 @@
 # ENTRUST (Laravel 5 Package)
 
-**This fork focuses on fixing some serious issues with Laravel 5.2.**
+**This fork focuses on fixing some serious issues with Laravel 5.2 and will not get maintained any longer.**
 
 Own changes:
 

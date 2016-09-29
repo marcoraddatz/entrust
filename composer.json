@@ -1,6 +1,6 @@
 {
   "name": "marcoraddatz/entrust",
-  "description": "This package provides a flexible way to add role-based permissions to Laravel",
+  "description": "This package patches some Laravel 5.2 related issues with Entrust and is not maintained any longer.",
   "keywords": [
     "laravel",
     "illuminate",
