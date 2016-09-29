@@ -1,6 +1,6 @@
 {
   "name": "marcoraddatz/entrust",
-  "description": "This package patches some Laravel 5.2 related issues with Entrust and is not maintained any longer.",
+  "description": "This package patches some Laravel 5.2 related issues with Entrust and is not maintained any longer. DO NOT INSTALL ON FRESH ENVIRONMENTS!",
   "keywords": [
     "laravel",
     "illuminate",
@@ -43,6 +43,10 @@
     "mockery/mockery": "dev-master",
     "illuminate/database": "~5.0",
     "sami/sami": "dev-master"
+  },
+  "suggest": {
+    "santigarcor/laratrust": "Actively maintained fork of Entrust.",
+    "silber/bouncer": "Modern and much better coded ACL alternative."
   },
   "autoload": {
     "classmap": [
